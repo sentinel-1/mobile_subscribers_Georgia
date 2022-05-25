@@ -18,6 +18,12 @@ nb_st = datetime.utcnow()
 print(f"\nNotebook START time: {nb_st} UTC\n")
 
 
+# In[2]:
+
+
+get_ipython().run_cell_magic('HTML', '', '<script>\n  function code_toggle() {\n    if (code_shown){\n      $(\'div.input\').hide(\'500\');\n      $(\'#toggleButton\').val(\'Show Python Code\')\n    } else {\n      $(\'div.input\').show(\'500\');\n      $(\'#toggleButton\').val(\'Hide Python Code\')\n    }\n    code_shown = !code_shown\n  }\n\n  $( document ).ready(function(){\n    code_shown=false;\n    $(\'div.input\').hide();\n    $(\'div.input:contains("%%HTML")\').removeClass( "input")\n  });\n</script>\n<form action="javascript:code_toggle()"><input type="submit" id="toggleButton" value="Show Python Code"></form>\n')
+
+
 # ## Index
 # 
 # - [Data](#Data)
@@ -52,7 +58,7 @@ print(f"\nNotebook START time: {nb_st} UTC\n")
 #   - [Yearly Scores for Natural Person subscribers](#Yearly-Scores-for-Natural-Person-subscribers)
 # - [Top Companies by Attractiveness Score](#Top-Companies-by-Attractiveness-Score)
 
-# In[2]:
+# In[3]:
 
 
 import pandas as pd
@@ -70,7 +76,7 @@ sns.set_theme()
 # 
 # ## Import the data
 
-# In[3]:
+# In[4]:
 
 
 def import_data_en(excel_path):
@@ -87,7 +93,7 @@ def import_data_en(excel_path):
     return df
 
 
-# In[4]:
+# In[5]:
 
 
 # Import data from 'data/EN/all.xlsx', 'data/EN/legal_entities.xlsx' and 'data/EN/natural_persons.xlsx' files:
@@ -101,7 +107,7 @@ all_df.head()
 
 # ## Interval of time covered by the given data
 
-# In[5]:
+# In[6]:
 
 
 start_month, end_month = all_df['Month'].min(), all_df['Month'].max()
@@ -115,13 +121,13 @@ print("\nGiven data covers the interval of time "
 # 
 # List of companies with their respective number of active months during the time period covered by the given data:
 
-# In[6]:
+# In[7]:
 
 
 display(all_df['Company'].value_counts().reset_index().rename({"Company": "Active Months", "index": "Company"}, axis=1))
 
 
-# In[7]:
+# In[8]:
 
 
 company_name_list = all_df['Company'].value_counts().index.to_list()
@@ -142,7 +148,7 @@ display(list(zip(company_name_list, company_color_palette)))
 
 # ## Date of merger of the Silknet and Geocell
 
-# In[8]:
+# In[9]:
 
 
 Geocell_last_month = all_df.loc[all_df['Company']=='Geocell','Month'].tail(1).item()
@@ -159,7 +165,7 @@ print(f'\n{Silknet_Geocell_merger_month.month_name()} {Silknet_Geocell_merger_mo
 
 # ## Date of COVID-19 Start
 
-# In[9]:
+# In[10]:
 
 
 # December 12, 2019:
@@ -183,7 +189,7 @@ print(f"COVID-19 start dates:\n - {COVID19_start_date:%B %d, %Y}: China\n - {COV
 # # Total number of subscribers
 # 
 
-# In[10]:
+# In[11]:
 
 
 years_df = all_df.assign(
@@ -193,7 +199,7 @@ years_df = all_df.assign(
 )
 
 
-# In[11]:
+# In[12]:
 
 
 fig=plt.figure(figsize=(18,9))
@@ -240,7 +246,7 @@ plt.close(fig)
 # ## All subscribers
 # 
 
-# In[12]:
+# In[13]:
 
 
 def plot_number_of_subscribers_by_company(df, title, yticks_range=np.arange(0,2.75,0.25)):
@@ -280,7 +286,7 @@ plot_number_of_subscribers_by_company(all_df, "All mobile subscribers by company
 
 # ## Legal Entity subscribers
 
-# In[13]:
+# In[14]:
 
 
 plot_number_of_subscribers_by_company(legal_entities_df, "Legal Entity mobile subscribers by company in Georgia", yticks_range=np.arange(0,0.8,0.1))
@@ -288,7 +294,7 @@ plot_number_of_subscribers_by_company(legal_entities_df, "Legal Entity mobile su
 
 # ## Natural Person subscribers
 
-# In[14]:
+# In[15]:
 
 
 plot_number_of_subscribers_by_company(natural_persons_df, "Natural Person mobile subscribers by company in Georgia", yticks_range=np.arange(0,2,0.1))
@@ -298,7 +304,7 @@ plot_number_of_subscribers_by_company(natural_persons_df, "Natural Person mobile
 # 
 # ## All subscribers trend
 
-# In[15]:
+# In[16]:
 
 
 def plot_trend_by_company_regression(subscribers_df, title, yticks_range=np.arange(0,2.75,0.25), merger_v_offset=5.2e5, regression_order=4):
@@ -362,7 +368,7 @@ plot_trend_by_company_regression(all_df, "All subscribers", regression_order=4)
 
 # ## Legal Entity subscribers trend
 
-# In[16]:
+# In[17]:
 
 
 plot_trend_by_company_regression(legal_entities_df, "Legal Entity mobile subscribers", yticks_range=np.arange(0,0.8,0.1), merger_v_offset=1.1e5, regression_order=2)
@@ -370,7 +376,7 @@ plot_trend_by_company_regression(legal_entities_df, "Legal Entity mobile subscri
 
 # ## Natural Person subscribers trend
 
-# In[17]:
+# In[18]:
 
 
 plot_trend_by_company_regression(natural_persons_df, "Natural Person mobile subscribers", yticks_range=np.arange(0,1.9,0.1), merger_v_offset=4.2e5, regression_order=4)
@@ -380,7 +386,7 @@ plot_trend_by_company_regression(natural_persons_df, "Natural Person mobile subs
 # 
 # 
 
-# In[18]:
+# In[19]:
 
 
 def get_total_subscribers_df(df):
@@ -422,7 +428,7 @@ print("New/Changed columns after applying the `compute_subscriber_and_market_fea
       "\n- ".join(list(compute_subscriber_and_market_features(all_df).columns.difference(all_df.columns))))
 
 
-# In[19]:
+# In[20]:
 
 
 print("\nDescriptive statistics of monthly changes in number of All Subscribers:\n")
@@ -430,7 +436,7 @@ with pd.option_context('display.float_format', '{:0.2f}'.format):
     display(compute_subscriber_and_market_features(all_df)[['MarketSubscribersDelta','CompanySubscribersDelta']].describe())
 
 
-# In[20]:
+# In[21]:
 
 
 print("\nDescriptive statistics of monthly changes in number of Legal Entity Subscribers:\n")
@@ -438,7 +444,7 @@ with pd.option_context('display.float_format', '{:0.2f}'.format):
     display(compute_subscriber_and_market_features(legal_entities_df)[['MarketSubscribersDelta','CompanySubscribersDelta']].describe())
 
 
-# In[21]:
+# In[22]:
 
 
 print("\nDescriptive statistics of monthly changes in number of Natural Person Subscribers:\n")
@@ -450,7 +456,7 @@ with pd.option_context('display.float_format', '{:0.2f}'.format):
 # 
 # ## All subscribers share
 
-# In[22]:
+# In[23]:
 
 
 def plot_market_share_of_companies(df, title):
@@ -488,7 +494,7 @@ plot_market_share_of_companies(all_df, "All subscribers share by company")
 
 # ## Legal Entity subscribers share
 
-# In[23]:
+# In[24]:
 
 
 plot_market_share_of_companies(legal_entities_df, "Legal Entity subscribers share by company")
@@ -496,7 +502,7 @@ plot_market_share_of_companies(legal_entities_df, "Legal Entity subscribers shar
 
 # ## Natural Person subscribers share
 
-# In[24]:
+# In[25]:
 
 
 plot_market_share_of_companies(natural_persons_df, "Natural Person subscribers share by company")
@@ -540,7 +546,7 @@ plot_market_share_of_companies(natural_persons_df, "Natural Person subscribers s
 # 
 # This formula is influenced by the data given in this analysis, as it was made speciphically for this data, which contains a limited information (i.e. mainly a number of subscribers), the intention was to make formula able to extract valuable insights from the given data. Although we cannot access directly performances of companies in the _PR & marketing_ or _customer satisfaction_ and other areas of their operations just by using this limited data, we still can use the `AttractivenessScore` obtained with this formula as a proxy into those performances combined without need for a more information, and as the formula also cancels some inherent noise of the data, the resulting metric is supposedly more close to a real world performance of the scored companies in terms of attracting subscribers.
 
-# In[25]:
+# In[26]:
 
 
 def compute_attractiveness_score(df):
@@ -555,13 +561,13 @@ def compute_attractiveness_score(df):
 # 
 # ## Monthly Scores for All subscribers
 
-# In[26]:
+# In[27]:
 
 
 display(compute_attractiveness_score(all_df)['AttractivenessScore'].describe())
 
 
-# In[27]:
+# In[28]:
 
 
 def plot_attractiveness_score_of_companies(df, title):
@@ -600,13 +606,13 @@ plot_attractiveness_score_of_companies(all_df, "Monthly Attractiveness Scores fo
 
 # ## Monthly Scores for Legal Entity subscribers
 
-# In[28]:
+# In[29]:
 
 
 display(compute_attractiveness_score(legal_entities_df)['AttractivenessScore'].describe())
 
 
-# In[29]:
+# In[30]:
 
 
 plot_attractiveness_score_of_companies(legal_entities_df, "Monthly Attractiveness Scores for Legal Entity subscribers")
@@ -614,13 +620,13 @@ plot_attractiveness_score_of_companies(legal_entities_df, "Monthly Attractivenes
 
 # ## Monthly Scores for Natural Person subscribers
 
-# In[30]:
+# In[31]:
 
 
 display(compute_attractiveness_score(natural_persons_df)['AttractivenessScore'].describe())
 
 
-# In[31]:
+# In[32]:
 
 
 plot_attractiveness_score_of_companies(natural_persons_df, "Monthly Attractiveness Scores for Natural Person subscribers")
@@ -630,7 +636,7 @@ plot_attractiveness_score_of_companies(natural_persons_df, "Monthly Attractivene
 # 
 # ## Yearly Scores for All subscribers
 
-# In[32]:
+# In[33]:
 
 
 def get_top_3_companies_per_year(df):
@@ -681,7 +687,7 @@ plot_yearly_attractiveness_score_of_companies(all_df,title)
 
 # ## Yearly Scores for Legal Entity subscribers
 
-# In[33]:
+# In[34]:
 
 
 title = "Yearly Attractiveness Scores of companies for Legal Entity subscribers"
@@ -692,7 +698,7 @@ plot_yearly_attractiveness_score_of_companies(legal_entities_df,title)
 
 # ## Yearly Scores for Natural Person subscribers
 
-# In[34]:
+# In[35]:
 
 
 title = "Yearly Attractiveness Scores of companies for Natural Person subscribers"
@@ -703,7 +709,7 @@ plot_yearly_attractiveness_score_of_companies(natural_persons_df,title)
 
 # # Top Companies by Attractiveness Score
 
-# In[35]:
+# In[36]:
 
 
 def get_top_companies_per_year(df, name):
@@ -746,7 +752,7 @@ for category in ('For All subscribers','For Legal Entity subscribers','For Natur
     print()
 
 
-# In[36]:
+# In[37]:
 
 
 print(f"\n ** Total Elapsed time: {datetime.utcnow() - nb_st} ** \n")
@@ -754,7 +760,7 @@ print(f"Notebook END time: {datetime.utcnow()} UTC\n")
 
 
 # 
-# _This notebook is originally published under the Apache License (Version 2.0) at the following GitHub repository: [sentinel-1/mobile_subscribers_Georgia](https://github.com/sentinel-1/mobile_subscribers_Georgia)_
+# *This notebook is originally published under the Apache License (Version 2.0) at the following GitHub repository: [sentinel-1/mobile_subscribers_Georgia](https://github.com/sentinel-1/mobile_subscribers_Georgia)*
 # 
 # For the issues, feedback or suggestions regarding the original notebook (if any) feel free to open an issue at the corresponding [Issues page of the repository](https://github.com/sentinel-1/mobile_subscribers_Georgia/issues)
 
