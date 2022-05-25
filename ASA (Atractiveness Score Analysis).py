@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# <center>
+#     <img src="images/ASA_Mobile_123.png" width="300" alt="ASA Mobile Companies Ranking 123 logo" />
+# </center>
+
 # # Top Mobile Communication Companies in Georgia by Attractiveness Score
 # 
 # Lets explore which mobile communication companies are operating in Georgia, how many subscribers do each of them serve, and how attractive each of them is.
