@@ -25,7 +25,7 @@ print(f"\nNotebook START time: {nb_st} UTC\n")
 # In[2]:
 
 
-get_ipython().run_cell_magic('HTML', '', '<script>\n  function code_toggle() {\n    if (code_shown){\n      $(\'div.input\').hide(\'500\');\n      $(\'#toggleButton\').val(\'Show Python Code\')\n    } else {\n      $(\'div.input\').show(\'500\');\n      $(\'#toggleButton\').val(\'Hide Python Code\')\n    }\n    code_shown = !code_shown\n  }\n\n  $( document ).ready(function(){\n    code_shown=false;\n    $(\'div.input\').hide();\n    $(\'div.input:contains("%%HTML")\').removeClass( "input")\n  });\n</script>\n<form action="javascript:code_toggle()"><input type="submit" id="toggleButton" value="Show Python Code"></form>\n')
+get_ipython().run_cell_magic('HTML', '', '<script>\n  function code_toggle() {\n    if (code_shown){\n      $(\'div.input\').hide(\'500\');\n      $(\'#toggleButton\').val(\'Show Python Code\')\n    } else {\n      $(\'div.input\').show(\'500\');\n      $(\'#toggleButton\').val(\'Hide Python Code\')\n    }\n    code_shown = !code_shown\n  }\n\n  $( document ).ready(function(){\n    code_shown=false;\n    $(\'div.input\').hide();\n    $(\'div.input:contains("%%HTML")\').removeClass( "input")\n  });\n</script>\n<form action="javascript:code_toggle()">\n  <input type="submit" id="toggleButton" value="Show Python Code">\n</form>\n')
 
 
 # ## Index
@@ -83,16 +83,21 @@ sns.set_theme()
 # In[4]:
 
 
-def import_data_en(excel_path):
-    df = pd.read_excel(excel_path).sort_values("Month",ascending=True).reset_index(drop=True)
-    # English version of original source contains some untranslated names, fixing it here:
+def import_data_en(excel_path: str) -> pd.DataFrame:
+    df = (pd
+          .read_excel(excel_path)
+          .sort_values("Month", ascending=True)
+          .reset_index(drop=True))
+    # English version of the original source contains some
+    # untranslated names, fixing it here:
     df = df.replace({
         'სილქნეტი': 'Silknet',
         'გლობალ სელ': 'Globalcell',
         'ჯიმობაილ': 'Gmobile',
         'ასანეტ': 'Asanet'  # AKA gosim
     })
-    # the 'Subscribers' column actually contains subscriber information per company, renaming accordingly:
+    # the 'Subscribers' column actually contains subscriber information
+    # per company, renaming it accordingly:
     df.rename({'Subscribers': 'CompanySubscribers'}, axis=1, inplace=True)
     return df
 
@@ -100,8 +105,10 @@ def import_data_en(excel_path):
 # In[5]:
 
 
-# Import data from 'data/EN/all.xlsx', 'data/EN/legal_entities.xlsx' and 'data/EN/natural_persons.xlsx' files:
-all_df, legal_entities_df, natural_persons_df = import_data_en('data/EN/all.xlsx'), import_data_en('data/EN/legal_entities.xlsx'), import_data_en('data/EN/natural_persons.xlsx')
+all_df = import_data_en('data/EN/all.xlsx')
+legal_entities_df = import_data_en('data/EN/legal_entities.xlsx')
+natural_persons_df = import_data_en('data/EN/natural_persons.xlsx')
+
 all_df.head()
 
 
@@ -117,8 +124,7 @@ all_df.head()
 start_month, end_month = all_df['Month'].min(), all_df['Month'].max()
 
 print("\nGiven data covers the interval of time "
-      f"from {start_month.month_name()} {start_month.year} "
-      f"to {end_month.month_name()} {end_month.year} (inclusive).\n")
+      f"from {start_month:%B %Y} to {end_month:%B %Y} (inclusive).\n")
 
 
 # ## Mobile Companies operationg in Georgia
@@ -128,7 +134,10 @@ print("\nGiven data covers the interval of time "
 # In[7]:
 
 
-display(all_df['Company'].value_counts().reset_index().rename({"Company": "Active Months", "index": "Company"}, axis=1))
+display(all_df['Company']
+        .value_counts()
+        .reset_index()
+        .rename({"Company": "Active Months", "index": "Company"}, axis=1))
 
 
 # In[8]:
@@ -143,10 +152,12 @@ company_colors = {
     'Geocell': 'tab:purple',
     'Globalcell': 'tab:orange',
     'Gmobile': 'tab:brown',
-    'Asanet': 'tab:green'
+    'Asanet': 'tab:green',
 }
-company_color_palette=[company_colors[company] for company in company_name_list]
-print("\nAttempting to make colors of companies similar to their respective brand/logo colors: \n")
+company_color_palette = [
+    company_colors[company] for company in company_name_list]
+print("\nAttempting to make colors of companies similar to their "
+      "respective brand/logo colors: \n")
 display(list(zip(company_name_list, company_color_palette)))
 
 
@@ -155,16 +166,30 @@ display(list(zip(company_name_list, company_color_palette)))
 # In[9]:
 
 
-Geocell_last_month = all_df.loc[all_df['Company']=='Geocell','Month'].tail(1).item()
-Silknet_Geocell_merger_month = all_df.loc[all_df['Month']>Geocell_last_month,'Month'].head(1).item()
+Geocell_last_month = (all_df
+                      .loc[all_df['Company']=='Geocell', 'Month']
+                      .tail(1)
+                      .item())
+Silknet_Geocell_merger_month = (all_df
+                                .loc[all_df['Month']>Geocell_last_month,
+                                     'Month']
+                                .head(1)
+                                .item())
 
-def get_Silknet_before_merger_subscribers(df):
-    return df.loc[(df['Month']==Geocell_last_month)&(df['Company']=='Silknet'),'CompanySubscribers'].item()
 
-def get_Silknet_Geocell_merger_subscribers(df):
-    return df.loc[(df['Month']==Silknet_Geocell_merger_month)&(df['Company']=='Silknet'),'CompanySubscribers'].item()
+def get_Silknet_before_merger_subscribers(df: pd.DataFrame) -> int:
+    return df.loc[
+        (df['Month']==Geocell_last_month) & (df['Company']=='Silknet'),
+        'CompanySubscribers'].item()
 
-print(f'\n{Silknet_Geocell_merger_month.month_name()} {Silknet_Geocell_merger_month.year} is the date of Merger of the Silknet and Geocell.\n')
+
+def get_Silknet_Geocell_merger_subscribers(df: pd.DataFrame) -> int:
+    return df.loc[(df['Month']==Silknet_Geocell_merger_month)
+                  & (df['Company']=='Silknet'), 'CompanySubscribers'].item()
+
+
+print(f'\n{Silknet_Geocell_merger_month:%B %Y} is the date of Merger'
+      ' of the Silknet and Geocell.\n')
 
 
 # ## Date of COVID-19 Start
@@ -173,21 +198,32 @@ print(f'\n{Silknet_Geocell_merger_month.month_name()} {Silknet_Geocell_merger_mo
 
 
 # December 12, 2019:
-# A cluster of patients in Wuhan, Hubei Providence, China begin to experience shortness of breath and fever.
+# A cluster of patients in Wuhan, Hubei Providence, China 
+# begin to experience shortness of breath and fever.
 COVID19_start_date = pd.Timestamp(year=2019, month=12, day=12)
 
 # February 26, 2020:
-# Georgia oficially confirmed its first COVID-19 case. Citizen of Georgia who returned from Iran came back to the Georgian border via Azerbaijan.
+# Georgia officially confirmed its first COVID-19 case.
+# Citizen of Georgia who returned from Iran came back
+# to the Georgian border via Azerbaijan.
 COVID19_start_date_Georgia = pd.Timestamp(year=2020, month=2, day=26)
 
-def get_total_subscribers_on_the_date(df, date):
-    observed_date_before = df.loc[(df['Month'] <= date), 'Month'].tail(1).item()  # FIXME ignoring edge cases
-    observed_date_after = df.loc[(df['Month'] >= date), 'Month'].head(1).item()
-    subscribers_before = df.loc[(df['Month'] == observed_date_before), 'CompanySubscribers'].sum()
-    subscribers_after = df.loc[(df['Month'] == observed_date_after), 'CompanySubscribers'].sum()
-    return int((subscribers_before + subscribers_after) / 2)
 
-print(f"COVID-19 start dates:\n - {COVID19_start_date:%B %d, %Y}: China\n - {COVID19_start_date_Georgia:%B %d, %Y}: Georiga")
+def get_total_subscribers_on_the_date(df: pd.DataFrame,
+                                      date: pd.Timestamp) -> int:
+    # FIXME ignoring edge cases:
+    observed_date_before = df.loc[(df['Month'] <= date),
+                                  'Month'].tail(1).item()
+    observed_date_after = df.loc[(df['Month'] >= date),
+                                 'Month'].head(1).item()
+    subscribers_before = df.loc[(df['Month'] == observed_date_before),
+                                'CompanySubscribers'].sum()
+    subscribers_after = df.loc[(df['Month'] == observed_date_after),
+                               'CompanySubscribers'].sum()
+    return int((subscribers_before+subscribers_after) / 2)
+
+print(f"COVID-19 start dates:\n - {COVID19_start_date:%B %d, %Y}: China")
+print(f" - {COVID19_start_date_Georgia:%B %d, %Y}: Georiga")
 
 
 # # Total number of subscribers
@@ -196,17 +232,16 @@ print(f"COVID-19 start dates:\n - {COVID19_start_date:%B %d, %Y}: China\n - {COV
 # In[11]:
 
 
-years_df = all_df.assign(
-    Year=lambda df:[x.year for x in df['Month']]
-).groupby('Year').first().reset_index().assign(
-    MonthNum=lambda df:df['Month'].astype(int)
-)
+years_df = (all_df
+            .assign(Year=lambda df: [x.year for x in df['Month']])
+            .groupby('Year').first().reset_index()
+            .assign(MonthNum=lambda df: df['Month'].astype(int)))
 
 
 # In[12]:
 
 
-fig=plt.figure(figsize=(18,9))
+fig = plt.figure(figsize=(18, 9))
 plt.title("Number of mobile subscribers in Georgia")
 plt.stackplot(
     all_df['Month'].unique(),
@@ -227,18 +262,19 @@ plt.gca().annotate(
     "COVID-19 Start",
     xy=COVID19_xy,
     xytext=COVID19_xy + np.array([pd.Timedelta(days=0), 3.5e5]),
-    arrowprops={'arrowstyle':'->','fc':'k','ec':'k','alpha':0.85},
+    arrowprops={'arrowstyle': '->', 'fc': 'k', 'ec': 'k', 'alpha': 0.85},
     fontsize=11, va="center", ha="center", alpha=0.85
 )
 plt.gca().annotate(
     "COVID-19 Confirmed in Georgia",
     xy=COVID19_Georgia_xy,
     xytext=COVID19_Georgia_xy - np.array([pd.Timedelta(days=185), 6.5e5]),
-    arrowprops={'arrowstyle':'->','fc':'k','ec':'k','alpha':0.85},
+    arrowprops={'arrowstyle': '->', 'fc': 'k', 'ec': 'k', 'alpha': 0.85},
     fontsize=11, va="center", ha="center", alpha=0.85
 )
 plt.gca().set(
-    yticks=np.arange(0,5.6,0.25)*1e6, yticklabels=np.arange(0,5.6,0.25), ylabel='Subscribers (M)',
+    yticks=np.arange(0, 5.6, 0.25) * 1e6,
+    yticklabels=np.arange(0, 5.6, 0.25), ylabel='Subscribers (M)',
     xticks=years_df['Month'], xticklabels=years_df['Year'], xlabel='')
 plt.legend(loc='upper left', title='Ownership type')
 plt.show()
@@ -253,10 +289,17 @@ plt.close(fig)
 # In[13]:
 
 
-def plot_number_of_subscribers_by_company(df, title, yticks_range=np.arange(0,2.75,0.25)):
-    companies = [company for company in company_name_list if company in df['Company'].unique()]
-    company_color_palette=[company_colors[company] for company in company_name_list if company in companies]
-    fig=plt.figure(figsize=(18,9))
+def plot_number_of_subscribers_by_company(
+        df: pd.DataFrame(),
+        title: str,
+        yticks_range: np.ndarray = np.arange(0, 2.75, 0.25)):
+    companies = [
+        company
+        for company in company_name_list if company in df['Company'].unique()]
+    company_color_palette = [
+        company_colors[company]
+        for company in company_name_list if company in companies]
+    fig=plt.figure(figsize=(18, 9))
     plt.title(title)
     ax = sns.lineplot(
         data=df,
@@ -270,7 +313,8 @@ def plot_number_of_subscribers_by_company(df, title, yticks_range=np.arange(0,2.
     with plt.rc_context({'lines.linestyle': '--'}):
         sns.lineplot(
             x=[Geocell_last_month, Silknet_Geocell_merger_month],
-            y=[get_Silknet_before_merger_subscribers(df), get_Silknet_Geocell_merger_subscribers(df)],
+            y=[get_Silknet_before_merger_subscribers(df),
+               get_Silknet_Geocell_merger_subscribers(df)],
             hue=['Merger (Silknet & Geocell)', 'Merger (Silknet & Geocell)'],
             palette=['tab:cyan'],
             alpha=0.8,
@@ -278,14 +322,18 @@ def plot_number_of_subscribers_by_company(df, title, yticks_range=np.arange(0,2.
             ax=ax
         )
     ax.set(
-        yticks=yticks_range*1e6, yticklabels=np.round(yticks_range, decimals=2), ylabel='Subscribers (M)',
+        yticks=yticks_range * 1e6,
+        yticklabels=np.round(yticks_range, decimals=2),
+        ylabel='Subscribers (M)',
         xticks=years_df['Month'], xticklabels=years_df['Year'], xlabel='')
     plt.legend(loc='upper left')
     plt.show()
     plt.close(fig)
 
 
-plot_number_of_subscribers_by_company(all_df, "All mobile subscribers by company in Georgia")
+plot_number_of_subscribers_by_company(
+    all_df,
+    "All mobile subscribers by company in Georgia")
 
 
 # ## Legal Entity subscribers
@@ -293,7 +341,10 @@ plot_number_of_subscribers_by_company(all_df, "All mobile subscribers by company
 # In[14]:
 
 
-plot_number_of_subscribers_by_company(legal_entities_df, "Legal Entity mobile subscribers by company in Georgia", yticks_range=np.arange(0,0.8,0.1))
+plot_number_of_subscribers_by_company(
+    legal_entities_df,
+    "Legal Entity mobile subscribers by company in Georgia",
+    yticks_range=np.arange(0, 0.8, 0.1))
 
 
 # ## Natural Person subscribers
@@ -301,7 +352,10 @@ plot_number_of_subscribers_by_company(legal_entities_df, "Legal Entity mobile su
 # In[15]:
 
 
-plot_number_of_subscribers_by_company(natural_persons_df, "Natural Person mobile subscribers by company in Georgia", yticks_range=np.arange(0,2,0.1))
+plot_number_of_subscribers_by_company(
+    natural_persons_df,
+    "Natural Person mobile subscribers by company in Georgia",
+    yticks_range=np.arange(0, 2, 0.1))
 
 
 # # Trend of number of sybscribers by company
@@ -311,24 +365,38 @@ plot_number_of_subscribers_by_company(natural_persons_df, "Natural Person mobile
 # In[16]:
 
 
-def plot_trend_by_company_regression(subscribers_df, title, yticks_range=np.arange(0,2.75,0.25), merger_v_offset=5.2e5, regression_order=4):
-    companies = [company for company in company_name_list if company in subscribers_df['Company'].unique()]
-    company_color_palette=[company_colors[company] for company in company_name_list if company in companies]
+def plot_trend_by_company_regression(
+        subscribers_df: pd.DataFrame,
+        title: str,
+        yticks_range: np.ndarray = np.arange(0, 2.75, 0.25),
+        merger_v_offset=5.2e5,
+        regression_order=4):
+    companies = [
+        company
+        for company in company_name_list
+        if company in subscribers_df['Company'].unique()]
+    company_color_palette=[
+        company_colors[company]
+        for company in company_name_list if company in companies]
     silknet_idx = companies.index('Silknet')
-    companies[silknet_idx:silknet_idx+1] = ['Silknet (before merger)', 'Silknet (after merger)', 'Geocell+Silknet']
-    company_color_palette[silknet_idx:silknet_idx+1] = ['tab:blue', 'tab:blue', 'tab:cyan']
-    
+    companies[silknet_idx:silknet_idx+1] = [
+        'Silknet (before merger)', 'Silknet (after merger)', 'Geocell+Silknet']
+    company_color_palette[silknet_idx:silknet_idx+1] = [
+        'tab:blue', 'tab:blue', 'tab:cyan']
     df = pd.concat([
         subscribers_df,
         subscribers_df
-            .loc[(subscribers_df['Company']=='Silknet')|(subscribers_df['Company']=='Geocell')]
+            .loc[(subscribers_df['Company']=='Silknet')
+                 | (subscribers_df['Company']=='Geocell')]
             .groupby('Month').sum().reset_index()
-        .assign(Company='Geocell+Silknet'),
+            .assign(Company='Geocell+Silknet'),
     ], axis=0, ignore_index=True)
-    df.loc[(df['Company']=='Silknet')&(df['Month']<Silknet_Geocell_merger_month), 'Company'] = 'Silknet (before merger)'
+    df.loc[(df['Company']=='Silknet')
+           & (df['Month']<Silknet_Geocell_merger_month),
+           'Company'] = 'Silknet (before merger)'
     df.loc[(df['Company']=='Silknet'), 'Company'] = 'Silknet (after merger)'
     
-    df = df.assign(MonthNum=lambda df:df['Month'].astype(int))
+    df = df.assign(MonthNum=lambda df: df['Month'].astype(int))
     
     grid = sns.lmplot(
         data=df,
@@ -342,14 +410,25 @@ def plot_trend_by_company_regression(subscribers_df, title, yticks_range=np.aran
         scatter_kws={"s": 8},
         order=regression_order,
     )
-    plt.title(title + " - {} regression".format({1:'Linear', 2:'Quadratic', 3:'Cubic', 4:'Quartic', 5:'Quintic', 6:'Sextic'}[regression_order]))
+    plt.title(title + " - {} regression".format(
+        {
+            1: 'Linear',
+            2: 'Quadratic',
+            3: 'Cubic',
+            4: 'Quartic',
+            5: 'Quintic',
+            6: 'Sextic',
+        }[regression_order]))
     
     grid.ax.set(
-        yticks=yticks_range*1e6, yticklabels=np.round(yticks_range,decimals=2), ylabel='Subscribers (M)',
+        yticks=yticks_range * 1e6,
+        yticklabels=np.round(yticks_range, decimals=2),
+        ylabel='Subscribers (M)',
         xticks=years_df['MonthNum'], xticklabels=years_df['Year'], xlabel='')
     
     merger_xy = np.array([
-        df.loc[df['Month']==Silknet_Geocell_merger_month, 'MonthNum'].head(1).item(),
+        df.loc[df['Month']==Silknet_Geocell_merger_month,
+               'MonthNum'].head(1).item(),
         get_Silknet_Geocell_merger_subscribers(subscribers_df)])
     
     grid.ax.annotate(
@@ -357,11 +436,13 @@ def plot_trend_by_company_regression(subscribers_df, title, yticks_range=np.aran
         xy=merger_xy,
         xytext=merger_xy + np.array([5e16, merger_v_offset]),
         arrowprops={
-            'arrowstyle': 'simple,head_length=1.8,head_width=1.2,tail_width=0.3',
+            'arrowstyle': ('simple,head_length=1.8,'
+                           'head_width=1.2,tail_width=0.3'),
             'connectionstyle': 'arc3,rad=0.45',
             'fc': 'w', 'ec': 'k', 'lw': 1.1, 'alpha': 0.5,
         },
-        bbox={'boxstyle': 'round4', 'alpha': 0.5, 'pad': 1.1, 'fc': 'w', 'ec': 'k', 'lw': 1.1},
+        bbox={'boxstyle': 'round4', 'alpha': 0.5, 'pad': 1.1,
+              'fc': 'w', 'ec': 'k', 'lw': 1.1},
         fontsize=12, va="center", ha="center",
     )
     plt.show()
@@ -375,7 +456,10 @@ plot_trend_by_company_regression(all_df, "All subscribers", regression_order=4)
 # In[17]:
 
 
-plot_trend_by_company_regression(legal_entities_df, "Legal Entity mobile subscribers", yticks_range=np.arange(0,0.8,0.1), merger_v_offset=1.1e5, regression_order=2)
+plot_trend_by_company_regression(
+    legal_entities_df, "Legal Entity mobile subscribers",
+    yticks_range=np.arange(0, 0.8, 0.1), merger_v_offset=1.1e5,
+    regression_order=2)
 
 
 # ## Natural Person subscribers trend
@@ -383,7 +467,10 @@ plot_trend_by_company_regression(legal_entities_df, "Legal Entity mobile subscri
 # In[18]:
 
 
-plot_trend_by_company_regression(natural_persons_df, "Natural Person mobile subscribers", yticks_range=np.arange(0,1.9,0.1), merger_v_offset=4.2e5, regression_order=4)
+plot_trend_by_company_regression(
+    natural_persons_df, "Natural Person mobile subscribers",
+    yticks_range=np.arange(0, 1.9, 0.1), merger_v_offset=4.2e5,
+    regression_order=4)
 
 
 # # Performance of Companies
@@ -393,7 +480,7 @@ plot_trend_by_company_regression(natural_persons_df, "Natural Person mobile subs
 # In[19]:
 
 
-def get_total_subscribers_df(df):
+def get_total_subscribers_df(df: pd.DataFrame) -> pd.DataFrame:
     return (df
             .groupby('Month')['CompanySubscribers']
             .sum()
@@ -402,58 +489,77 @@ def get_total_subscribers_df(df):
             .assign(
                 MarketSubscribersDelta=lambda df: np.concatenate([
                     np.array([0]),
-                    df.iloc[1:]['MarketSubscribers'].to_numpy() - df.iloc[:-1]['MarketSubscribers'].to_numpy()
+                    df.iloc[1:]['MarketSubscribers'].to_numpy()
+                    - df.iloc[:-1]['MarketSubscribers'].to_numpy()
                 ])
             )
            )
 
-def compute_subscriber_and_market_features(df):    
+
+def compute_subscriber_and_market_features(df: pd.DataFrame) -> pd.DataFrame:    
     df = (df
-          .join(get_total_subscribers_df(df)[['Month','MarketSubscribers','MarketSubscribersDelta']].set_index('Month'), on='Month')
+          .join(get_total_subscribers_df(df)[['Month', 'MarketSubscribers',
+                                              'MarketSubscribersDelta']]
+                .set_index('Month'), on='Month')
           .groupby('Company')
           .apply(lambda group_df: group_df.assign(
               CompanySubscribersDelta=lambda df: np.concatenate([
                   np.array([0]),
-                  (df.iloc[1:]['CompanySubscribers'].to_numpy() - df.iloc[:-1]['CompanySubscribers'].to_numpy())
+                  (df.iloc[1:]['CompanySubscribers'].to_numpy()
+                   - df.iloc[:-1]['CompanySubscribers'].to_numpy())
               ])
           ))
           .assign(
-              CompanySubscribersShare=lambda df: df['CompanySubscribers']/df['MarketSubscribers'],
-              CompanySubscribersShareOld=lambda df:np.concatenate([
+              CompanySubscribersShare=lambda df: (df['CompanySubscribers']
+                                                  / df['MarketSubscribers']),
+              CompanySubscribersShareOld=lambda df: np.concatenate([
                   np.array([0]),
                   df['CompanySubscribersShare'].to_numpy()[:-1]
               ])
           )
          )
-    df.loc[(df['Company']=='Silknet')&(df['Month']==Silknet_Geocell_merger_month), 'CompanySubscribersDelta'] = 0  # extreme outlier & it is an effect of merger not an actual growth...
+    df.loc[(df['Company']=='Silknet')
+           & (df['Month']==Silknet_Geocell_merger_month),
+           'CompanySubscribersDelta'] = 0  # merger... not an actual growth...
     return df
 
-print("New/Changed columns after applying the `compute_subscriber_and_market_features()` function to DataFrame:\n-",
-      "\n- ".join(list(compute_subscriber_and_market_features(all_df).columns.difference(all_df.columns))))
+print("New/Changed columns after applying the "
+      "`compute_subscriber_and_market_features()` function to DataFrame:\n-",
+      "\n- ".join(list(compute_subscriber_and_market_features(all_df).columns
+                       .difference(all_df.columns))))
 
 
 # In[20]:
 
 
-print("\nDescriptive statistics of monthly changes in number of All Subscribers:\n")
+print("\nDescriptive statistics of monthly changes in the number "
+      "of All Subscribers:\n")
 with pd.option_context('display.float_format', '{:0.2f}'.format):
-    display(compute_subscriber_and_market_features(all_df)[['MarketSubscribersDelta','CompanySubscribersDelta']].describe())
+    display(compute_subscriber_and_market_features(all_df)[[
+        'MarketSubscribersDelta', 'CompanySubscribersDelta'
+    ]].describe())
 
 
 # In[21]:
 
 
-print("\nDescriptive statistics of monthly changes in number of Legal Entity Subscribers:\n")
+print("\nDescriptive statistics of monthly changes in the number "
+      "of Legal Entity Subscribers:\n")
 with pd.option_context('display.float_format', '{:0.2f}'.format):
-    display(compute_subscriber_and_market_features(legal_entities_df)[['MarketSubscribersDelta','CompanySubscribersDelta']].describe())
+    display(compute_subscriber_and_market_features(legal_entities_df)[[
+        'MarketSubscribersDelta', 'CompanySubscribersDelta'
+    ]].describe())
 
 
 # In[22]:
 
 
-print("\nDescriptive statistics of monthly changes in number of Natural Person Subscribers:\n")
+print("\nDescriptive statistics of monthly changes in the number "
+      "of Natural Person Subscribers:\n")
 with pd.option_context('display.float_format', '{:0.2f}'.format):
-    display(compute_subscriber_and_market_features(natural_persons_df)[['MarketSubscribersDelta','CompanySubscribersDelta']].describe())
+    display(compute_subscriber_and_market_features(natural_persons_df)[[
+        'MarketSubscribersDelta', 'CompanySubscribersDelta'
+    ]].describe())
 
 
 # # Share Of Subscribers by company
@@ -463,11 +569,15 @@ with pd.option_context('display.float_format', '{:0.2f}'.format):
 # In[23]:
 
 
-def plot_market_share_of_companies(df, title):
+def plot_market_share_of_companies(df: pd.DataFrame, title: str):
     df = compute_subscriber_and_market_features(df)
     
-    companies = [company for company in company_name_list if company in df['Company'].unique()]
-    company_color_palette=[company_colors[company] for company in company_name_list if company in companies]
+    companies = [
+        company for company in company_name_list
+        if company in df['Company'].unique()]
+    company_color_palette=[
+        company_colors[company] for company in company_name_list
+        if company in companies]
     
     company_subscribers = (df[['Month','Company','CompanySubscribersShare']]
                            .pivot(index='Month',columns='Company')
@@ -486,7 +596,8 @@ def plot_market_share_of_companies(df, title):
         alpha=0.5
     )
     plt.gca().set(
-        yticks=np.arange(0,1.01,0.05), yticklabels=np.arange(0,101,5), ylabel='% of Subscribers',
+        yticks=np.arange(0, 1.01, 0.05), yticklabels=np.arange(0, 101, 5),
+        ylabel='% of Subscribers',
         xticks=years_df['Month'], xticklabels=years_df['Year'], xlabel='')
     plt.legend(loc='upper left')
     plt.show()
@@ -501,7 +612,8 @@ plot_market_share_of_companies(all_df, "All subscribers share by company")
 # In[24]:
 
 
-plot_market_share_of_companies(legal_entities_df, "Legal Entity subscribers share by company")
+plot_market_share_of_companies(legal_entities_df,
+                               "Legal Entity subscribers share by company")
 
 
 # ## Natural Person subscribers share
@@ -509,7 +621,8 @@ plot_market_share_of_companies(legal_entities_df, "Legal Entity subscribers shar
 # In[25]:
 
 
-plot_market_share_of_companies(natural_persons_df, "Natural Person subscribers share by company")
+plot_market_share_of_companies(natural_persons_df,
+                               "Natural Person subscribers share by company")
 
 
 # # The formula of The Atractiveness Score
@@ -553,9 +666,14 @@ plot_market_share_of_companies(natural_persons_df, "Natural Person subscribers s
 # In[26]:
 
 
-def compute_attractiveness_score(df):
+def compute_attractiveness_score(df: pd.DataFrame) -> pd.DataFrame:
     return compute_subscriber_and_market_features(df).assign(
-        AttractivenessScore = lambda df:df['CompanySubscribersDelta'] - (0.5*(df['CompanySubscribersShareOld'] + df['CompanySubscribersShare']) * df['MarketSubscribersDelta'])
+        AttractivenessScore = lambda df: (
+            df['CompanySubscribersDelta']
+            - (0.5 * (df['CompanySubscribersShareOld']
+                      + df['CompanySubscribersShare'])
+               * df['MarketSubscribersDelta'])
+        )
     )
 
 
@@ -574,27 +692,37 @@ display(compute_attractiveness_score(all_df)['AttractivenessScore'].describe())
 # In[28]:
 
 
-def plot_attractiveness_score_of_companies(df, title):
-    df = df.assign(MonthNum=lambda df:df['Month'].astype(int),Year=lambda df:[x.year for x in df['Month']])
+def plot_attractiveness_score_of_companies(df: pd.DataFrame, title: str):
+    df = df.assign(MonthNum=lambda df: df['Month'].astype(int),
+                   Year=lambda df: [x.year for x in df['Month']])
     df = compute_attractiveness_score(df)
     
-    companies = [company for company in company_name_list if company in df['Company'].unique()]
-    company_color_palette=[company_colors[company] for company in company_name_list if company in companies]
+    companies = [
+        company for company in company_name_list
+        if company in df['Company'].unique()]
+    company_color_palette = [
+        company_colors[company] for company in company_name_list
+        if company in companies]
     
-    grid = sns.FacetGrid(df, col="Company", hue="Company", col_order=companies, hue_order=companies, palette=company_color_palette,
-                     col_wrap=2, height=7.5)
+    grid = sns.FacetGrid(df, col="Company", hue="Company", col_order=companies,
+                         hue_order=companies, palette=company_color_palette,
+                         col_wrap=2, height=7.5)
     grid.refline(y=0, linestyle=":")  # Draw a horizontal line at zero
-    grid.map(sns.regplot, 'MonthNum', 'AttractivenessScore', marker='o', order=2, ci=98)
-    grid.set_titles(col_template=f"{{col_name}} - {title}", row_template="{row_name}")
+    grid.map(sns.regplot, 'MonthNum', 'AttractivenessScore', marker='o',
+             order=2, ci=98)
+    grid.set_titles(col_template=f"{{col_name}} - {title}",
+                    row_template="{row_name}")
     grid.set(
         ylabel='Attractiveness Score',
         xticks=years_df['MonthNum'], xticklabels=years_df['Year'], xlabel='',
         ylim=(-55000, 55000)
     )
     grid.fig.tight_layout(w_pad=1)
-    grid.figure.add_axes([0.075, -0.27, 0.915, 0.25])  # Add additional axis to plot boxplot in the end
+    # Add additional axis to plot boxplot in the end:
+    grid.figure.add_axes([0.075, -0.27, 0.915, 0.25])
     ax = sns.boxplot(data=df, x='Year', y='AttractivenessScore',
-                     hue='Company', hue_order=companies, palette=company_color_palette,
+                     hue='Company', hue_order=companies,
+                     palette=company_color_palette,
                      linewidth=0.7, fliersize=1.7)
     ax.set_title(f"{title} by company")
     ax.set(
@@ -605,7 +733,8 @@ def plot_attractiveness_score_of_companies(df, title):
     plt.show()
 
 
-plot_attractiveness_score_of_companies(all_df, "Monthly Attractiveness Scores for All subscribers")
+plot_attractiveness_score_of_companies(
+    all_df, "Monthly Attractiveness Scores for All subscribers")
 
 
 # ## Monthly Scores for Legal Entity subscribers
@@ -613,13 +742,16 @@ plot_attractiveness_score_of_companies(all_df, "Monthly Attractiveness Scores fo
 # In[29]:
 
 
-display(compute_attractiveness_score(legal_entities_df)['AttractivenessScore'].describe())
+display(compute_attractiveness_score(
+    legal_entities_df)['AttractivenessScore'].describe())
 
 
 # In[30]:
 
 
-plot_attractiveness_score_of_companies(legal_entities_df, "Monthly Attractiveness Scores for Legal Entity subscribers")
+plot_attractiveness_score_of_companies(
+    legal_entities_df,
+    "Monthly Attractiveness Scores for Legal Entity subscribers")
 
 
 # ## Monthly Scores for Natural Person subscribers
@@ -627,13 +759,16 @@ plot_attractiveness_score_of_companies(legal_entities_df, "Monthly Attractivenes
 # In[31]:
 
 
-display(compute_attractiveness_score(natural_persons_df)['AttractivenessScore'].describe())
+display(compute_attractiveness_score(
+    natural_persons_df)['AttractivenessScore'].describe())
 
 
 # In[32]:
 
 
-plot_attractiveness_score_of_companies(natural_persons_df, "Monthly Attractiveness Scores for Natural Person subscribers")
+plot_attractiveness_score_of_companies(
+    natural_persons_df,
+    "Monthly Attractiveness Scores for Natural Person subscribers")
 
 
 # # Yearly Attractiveness Scores of Companies
@@ -643,35 +778,48 @@ plot_attractiveness_score_of_companies(natural_persons_df, "Monthly Attractivene
 # In[33]:
 
 
-def get_top_3_companies_per_year(df):
+def get_top_3_companies_per_year(df: pd.DataFrame) -> pd.DataFrame:
     df = df.assign(
         MonthNum=lambda df: df['Month'].astype(int),
         Year=lambda df: [x.year for x in df['Month']],
     )
     
     df = (compute_attractiveness_score(df)
-          .groupby(['Company', 'Year']).aggregate({'AttractivenessScore': 'sum'}).reset_index()
-          .groupby('Year').apply(lambda df: df.sort_values('AttractivenessScore', ascending=False).head(3).reset_index(drop=True))
+          .groupby(['Company', 'Year'])
+          .aggregate({'AttractivenessScore': 'sum'}).reset_index()
+          .groupby('Year')
+          .apply(lambda df: (df
+                             .sort_values('AttractivenessScore',
+                                          ascending=False)
+                             .head(3)
+                             .reset_index(drop=True)))
           .reset_index(level=1).rename({'level_1': 'Place'}, axis=1)
           .pivot('Year', 'Place').rename({0: 1, 1: 2, 2: 3}, axis=1)
     )
     return df
 
 
-def plot_yearly_attractiveness_score_of_companies(df, title):
+def plot_yearly_attractiveness_score_of_companies(df: pd.DataFrame,
+                                                  title: str):
     df = df.assign(
         MonthNum=lambda df: df['Month'].astype(int),
         Year=lambda df: [x.year for x in df['Month']]
     )
     df = compute_attractiveness_score(df)
-    df = df.groupby(['Company', 'Year']).aggregate({'AttractivenessScore': 'sum'}).reset_index()
+    df = (df.groupby(['Company', 'Year'])
+          .aggregate({'AttractivenessScore': 'sum'}).reset_index())
     
-    companies = [company for company in company_name_list if company in df['Company'].unique()]
-    company_color_palette=[company_colors[company] for company in company_name_list if company in companies]
+    companies = [
+        company for company in company_name_list
+        if company in df['Company'].unique()]
+    company_color_palette = [
+        company_colors[company] for company in company_name_list
+        if company in companies]
     
-    fig = plt.figure(figsize=(18,9))
+    fig = plt.figure(figsize=(18, 9))
     ax = sns.lineplot(data=df, x='Year', y='AttractivenessScore',
-                      hue='Company', hue_order=companies, palette=company_color_palette,
+                      hue='Company', hue_order=companies,
+                      palette=company_color_palette,
                       style='Company', markers=True)
     ax.set(
         ylabel='Attractiveness Score',
@@ -686,7 +834,7 @@ def plot_yearly_attractiveness_score_of_companies(df, title):
 title = "Yearly Attractiveness Scores of companies for All subscribers"
 print(f'\n{title}:\n')
 display(get_top_3_companies_per_year(all_df))
-plot_yearly_attractiveness_score_of_companies(all_df,title)
+plot_yearly_attractiveness_score_of_companies(all_df, title)
 
 
 # ## Yearly Scores for Legal Entity subscribers
@@ -694,10 +842,11 @@ plot_yearly_attractiveness_score_of_companies(all_df,title)
 # In[34]:
 
 
-title = "Yearly Attractiveness Scores of companies for Legal Entity subscribers"
+title = ("Yearly Attractiveness Scores of companies "
+         "for Legal Entity subscribers")
 print(f'\n{title}:\n')
 display(get_top_3_companies_per_year(legal_entities_df))
-plot_yearly_attractiveness_score_of_companies(legal_entities_df,title)
+plot_yearly_attractiveness_score_of_companies(legal_entities_df, title)
 
 
 # ## Yearly Scores for Natural Person subscribers
@@ -705,10 +854,11 @@ plot_yearly_attractiveness_score_of_companies(legal_entities_df,title)
 # In[35]:
 
 
-title = "Yearly Attractiveness Scores of companies for Natural Person subscribers"
+title = ("Yearly Attractiveness Scores of companies "
+         "for Natural Person subscribers")
 print(f'\n{title}:\n')
 display(get_top_3_companies_per_year(legal_entities_df))
-plot_yearly_attractiveness_score_of_companies(natural_persons_df,title)
+plot_yearly_attractiveness_score_of_companies(natural_persons_df, title)
 
 
 # # Top Companies by Attractiveness Score
@@ -716,10 +866,13 @@ plot_yearly_attractiveness_score_of_companies(natural_persons_df,title)
 # In[36]:
 
 
-def get_top_companies_per_year(df, name):
-    return get_top_3_companies_per_year(df).loc[:,[('Company',1)]].T.reset_index(drop=True).T.rename({0:name}, axis=1)
+def get_top_companies_per_year(df: pd.DataFrame, name: str) -> pd.DataFrame:
+    return (get_top_3_companies_per_year(df)
+            .loc[:,[('Company',1)]].T.reset_index(drop=True).T
+            .rename({0:name}, axis=1))
 
-def extract_available_months(df):
+
+def extract_available_months(df: pd.DataFrame) -> pd.DataFrame:
     return (df
             .assign(
                 MonthName=lambda df: [x.month_name() for x in df['Month']],
@@ -728,7 +881,7 @@ def extract_available_months(df):
             .groupby('Year')
             .apply(lambda df: pd.DataFrame({
                 "Months": [
-                    ' - '.join((lambda months:[months[0],months[-1]] if len(months) > 1 else months)(
+                    ' - '.join((lambda m: [m[0], m[-1]] if len(m) > 1 else m)(
                         df['MonthName'].unique()
                     ))
                 ]
@@ -736,21 +889,30 @@ def extract_available_months(df):
            ).set_index('Year').filter(['Months'])
 
 
-print("\nTop Mobile Communication Companies in Georgia by Attractiveness Score per year:\n")
-top_companies_df = get_top_companies_per_year(all_df,"For All subscribers").join(
-    get_top_companies_per_year(legal_entities_df,"For Legal Entity subscribers")
+print("\nTop Mobile Communication Companies in Georgia "
+      "by Attractiveness Score per year:\n")
+top_companies_df = get_top_companies_per_year(all_df,
+                                              "For All subscribers").join(
+    get_top_companies_per_year(legal_entities_df,
+                               "For Legal Entity subscribers")
 ).join(
-    get_top_companies_per_year(natural_persons_df,"For Natural Person subscribers")
+    get_top_companies_per_year(natural_persons_df,
+                               "For Natural Person subscribers")
 ).join(
     extract_available_months(all_df)
-).reset_index().set_index(['Months','Year'])
+).reset_index().set_index(['Months', 'Year'])
 display(top_companies_df)
 
-for category in ('For All subscribers','For Legal Entity subscribers','For Natural Person subscribers'):
-    print(f'{category} during the {top_companies_df.loc["January - December"].index.min()}'
+for category in ('For All subscribers', 'For Legal Entity subscribers',
+                 'For Natural Person subscribers'):
+    print(f'{category} during the '
+          f'{top_companies_df.loc["January - December"].index.min()}'
           f' – {top_companies_df.loc["January - December"].index.max()} years '
-          f'the following companies held the yearly top spot:')
-    for company,count in top_companies_df.loc['January - December',category].value_counts().iteritems():
+          'the following companies held the yearly top spot:')
+    
+    for company,count in top_companies_df.loc['January - December',
+                                              category
+                                             ].value_counts().iteritems():
         company = '"{}"'.format(company)
         print(f' - {company:<16} {count:} {"times" if count > 1 else "time"}.')
     print()
