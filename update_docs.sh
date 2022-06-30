@@ -24,6 +24,11 @@ DOCS_DIR="${SCRIPT_DIR}/docs"
   --to html --output-dir="${DOCS_DIR}" --output="index" --template OGP_classic
 
 ##
+# Update the `images/` folder
+##
+cp -rf images/ "${DOCS_DIR}"
+
+##
 # Generate PDF
 ##
 "${ENV_BIN}jupyter-nbconvert" "${NOTEBOOK_NAME}" \
