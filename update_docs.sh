@@ -24,6 +24,12 @@ DOCS_DIR="${SCRIPT_DIR}/docs"
   --to html --output-dir="${DOCS_DIR}" --output="index" --template OGP_classic
 
 ##
+# Update the ranking.png
+##
+cp -f ranking.png "${DOCS_DIR}"
+
+
+##
 # Update the `images/` folder
 ##
 cp -rf images/ "${DOCS_DIR}"

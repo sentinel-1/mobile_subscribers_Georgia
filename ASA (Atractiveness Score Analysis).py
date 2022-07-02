@@ -5,6 +5,16 @@
 #     <img src="images/ASA_Mobile_123.png" width="300" alt="ASA Mobile Companies Ranking 123 logo" />
 # </center>
 
+# # Ranking of Mobile Network Operators in Georgia
+
+# In[1]:
+
+
+from IPython.display import display, HTML
+
+display(HTML("""<img alt="Ranking of Mobile Network Operators in Georgia" src="ranking.png"></img>"""))
+
+
 # # Mobile Communication Companies in Georgia ranked by Attractiveness Score
 # 
 # Lets explore which mobile communication companies are operating in Georgia, how many subscribers do each of them serve, and how attractive each of them is.
@@ -12,9 +22,8 @@
 # Here an attractiveness of a company, or more specifically the "Attractiveness Score" which is defined later in this document, measures an ability of company to attract and retain subscribers. 
 # 
 # Finally, best performing companies according to the "Attractiveness Score", for each year we have data for, and per category of subscribers (categories being "All subscribers" combined, "Legal Entity subscribers" and "Natural Person subscribers"), are found via this analysis and are listed towards the end of this notebook.
-# 
 
-# In[1]:
+# In[2]:
 
 
 from datetime import datetime, timedelta
@@ -22,7 +31,7 @@ nb_st = datetime.utcnow()
 print(f"\nNotebook START time: {nb_st} UTC\n")
 
 
-# In[2]:
+# In[3]:
 
 
 get_ipython().run_cell_magic('HTML', '', '<style>\n@media (max-width: 540px) {\n  .output .output_subarea {\n    max-width: 100%;\n  }\n}\n</style>\n<script>\n  function code_toggle() {\n    if (code_shown){\n      $(\'div.input\').hide(\'500\');\n      $(\'#toggleButton\').val(\'🔎 Show Python Code\')\n    } else {\n      $(\'div.input\').show(\'500\');\n      $(\'#toggleButton\').val(\'⌦ Hide Python Code\')\n    }\n    code_shown = !code_shown\n  }\n\n  $( document ).ready(function(){\n    code_shown=false;\n    $(\'div.input\').hide();\n    $(\'div.input:contains("%%HTML")\').removeClass( "input")\n    $(\'div.input:contains("%%capture")\').removeClass("input")\n  });\n</script>\n<form action="javascript:code_toggle()">\n  <input type="submit" id="toggleButton" value="🔎 Show Python Code"\n         class="btn btn-default btn-lg">\n</form>\n')
@@ -62,14 +71,13 @@ get_ipython().run_cell_magic('HTML', '', '<style>\n@media (max-width: 540px) {\n
 #   - [Yearly Scores for Natural Person subscribers](#Yearly-Scores-for-Natural-Person-subscribers)
 # - [Top Companies by Attractiveness Score](#Top-Companies-by-Attractiveness-Score)
 
-# In[3]:
+# In[4]:
 
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from IPython.display import display
 sns.set_theme()
 
 
@@ -80,7 +88,7 @@ sns.set_theme()
 # 
 # ## Import the data
 
-# In[4]:
+# In[5]:
 
 
 def import_data_en(excel_path: str) -> pd.DataFrame:
@@ -102,7 +110,7 @@ def import_data_en(excel_path: str) -> pd.DataFrame:
     return df
 
 
-# In[5]:
+# In[6]:
 
 
 all_df = import_data_en('data/EN/all.xlsx')
@@ -118,7 +126,7 @@ all_df.head()
 
 # ## Interval of time covered by the given data
 
-# In[6]:
+# In[7]:
 
 
 start_month, end_month = all_df['Month'].min(), all_df['Month'].max()
@@ -131,16 +139,37 @@ print("\nGiven data covers the interval of time "
 # 
 # List of companies with their respective number of active months during the time period covered by the given data:
 
-# In[7]:
-
-
-display(all_df['Company']
-        .value_counts()
-        .reset_index()
-        .rename({"Company": "Active Months", "index": "Company"}, axis=1))
-
-
 # In[8]:
+
+
+def get_active_monts_df(df: pd.DataFrame) -> pd.DataFrame:
+    return (df['Company']
+            .value_counts()
+            .reset_index()
+            .rename({"Company": "Active Months", "index": "Company"}, axis=1))
+
+all_df_active_months = get_active_monts_df(all_df)
+print("# of active months for All Subscribers")
+display(all_df_active_months)
+
+
+# In[9]:
+
+
+legal_entities_df_active_months = get_active_monts_df(legal_entities_df)
+print("# of active months for Legal Entities")
+display(legal_entities_df_active_months)
+
+
+# In[10]:
+
+
+natural_persons_df_active_months = get_active_monts_df(natural_persons_df)
+print("# of active months for Natural Persons")
+display(natural_persons_df_active_months)
+
+
+# In[11]:
 
 
 company_name_list = all_df['Company'].value_counts().index.to_list()
@@ -163,7 +192,7 @@ display(list(zip(company_name_list, company_color_palette)))
 
 # ## Date of merger of the Silknet and Geocell
 
-# In[9]:
+# In[12]:
 
 
 Geocell_last_month = (all_df
@@ -194,7 +223,7 @@ print(f'\n{Silknet_Geocell_merger_month:%B %Y} is the date of Merger'
 
 # ## Date of COVID-19 Start
 
-# In[10]:
+# In[13]:
 
 
 # December 12, 2019:
@@ -229,7 +258,7 @@ print(f" - {COVID19_start_date_Georgia:%B %d, %Y}: Georiga")
 # # Total number of subscribers
 # 
 
-# In[11]:
+# In[14]:
 
 
 years_df = (all_df
@@ -238,7 +267,7 @@ years_df = (all_df
             .assign(MonthNum=lambda df: df['Month'].astype(int)))
 
 
-# In[12]:
+# In[15]:
 
 
 fig = plt.figure(figsize=(18, 9))
@@ -286,7 +315,7 @@ plt.close(fig)
 # ## All subscribers
 # 
 
-# In[13]:
+# In[16]:
 
 
 def plot_number_of_subscribers_by_company(
@@ -338,7 +367,7 @@ plot_number_of_subscribers_by_company(
 
 # ## Legal Entity subscribers
 
-# In[14]:
+# In[17]:
 
 
 plot_number_of_subscribers_by_company(
@@ -349,7 +378,7 @@ plot_number_of_subscribers_by_company(
 
 # ## Natural Person subscribers
 
-# In[15]:
+# In[18]:
 
 
 plot_number_of_subscribers_by_company(
@@ -362,7 +391,7 @@ plot_number_of_subscribers_by_company(
 # 
 # ## All subscribers trend
 
-# In[16]:
+# In[19]:
 
 
 def plot_trend_by_company_regression(
@@ -453,7 +482,7 @@ plot_trend_by_company_regression(all_df, "All subscribers", regression_order=4)
 
 # ## Legal Entity subscribers trend
 
-# In[17]:
+# In[20]:
 
 
 plot_trend_by_company_regression(
@@ -464,7 +493,7 @@ plot_trend_by_company_regression(
 
 # ## Natural Person subscribers trend
 
-# In[18]:
+# In[21]:
 
 
 plot_trend_by_company_regression(
@@ -477,7 +506,7 @@ plot_trend_by_company_regression(
 # 
 # 
 
-# In[19]:
+# In[22]:
 
 
 def get_total_subscribers_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -529,7 +558,7 @@ print("New/Changed columns after applying the "
                        .difference(all_df.columns))))
 
 
-# In[20]:
+# In[23]:
 
 
 print("\nDescriptive statistics of monthly changes in the number "
@@ -540,7 +569,7 @@ with pd.option_context('display.float_format', '{:0.2f}'.format):
     ]].describe())
 
 
-# In[21]:
+# In[24]:
 
 
 print("\nDescriptive statistics of monthly changes in the number "
@@ -551,7 +580,7 @@ with pd.option_context('display.float_format', '{:0.2f}'.format):
     ]].describe())
 
 
-# In[22]:
+# In[25]:
 
 
 print("\nDescriptive statistics of monthly changes in the number "
@@ -566,7 +595,7 @@ with pd.option_context('display.float_format', '{:0.2f}'.format):
 # 
 # ## All subscribers share
 
-# In[23]:
+# In[26]:
 
 
 def plot_market_share_of_companies(df: pd.DataFrame, title: str):
@@ -609,7 +638,7 @@ plot_market_share_of_companies(all_df, "All subscribers share by company")
 
 # ## Legal Entity subscribers share
 
-# In[24]:
+# In[27]:
 
 
 plot_market_share_of_companies(legal_entities_df,
@@ -618,7 +647,7 @@ plot_market_share_of_companies(legal_entities_df,
 
 # ## Natural Person subscribers share
 
-# In[25]:
+# In[28]:
 
 
 plot_market_share_of_companies(natural_persons_df,
@@ -663,7 +692,7 @@ plot_market_share_of_companies(natural_persons_df,
 # 
 # This formula is influenced by the data given in this analysis, as it was made speciphically for this data, which contains a limited information (i.e. mainly a number of subscribers), the intention was to make formula able to extract valuable insights from the given data. Although we cannot access directly performances of companies in the _PR & marketing_ or _customer satisfaction_ and other areas of their operations just by using this limited data, we still can use the `AttractivenessScore` obtained with this formula as a proxy into those performances combined without need for a more information, and as the formula also cancels some inherent noise of the data, the resulting metric is supposedly more close to a real world performance of the scored companies in terms of attracting subscribers.
 
-# In[26]:
+# In[29]:
 
 
 def compute_attractiveness_score(df: pd.DataFrame) -> pd.DataFrame:
@@ -683,13 +712,13 @@ def compute_attractiveness_score(df: pd.DataFrame) -> pd.DataFrame:
 # 
 # ## Monthly Scores for All subscribers
 
-# In[27]:
+# In[30]:
 
 
 display(compute_attractiveness_score(all_df)['AttractivenessScore'].describe())
 
 
-# In[28]:
+# In[31]:
 
 
 def plot_attractiveness_score_of_companies(df: pd.DataFrame, title: str):
@@ -739,14 +768,14 @@ plot_attractiveness_score_of_companies(
 
 # ## Monthly Scores for Legal Entity subscribers
 
-# In[29]:
+# In[32]:
 
 
 display(compute_attractiveness_score(
     legal_entities_df)['AttractivenessScore'].describe())
 
 
-# In[30]:
+# In[33]:
 
 
 plot_attractiveness_score_of_companies(
@@ -756,14 +785,14 @@ plot_attractiveness_score_of_companies(
 
 # ## Monthly Scores for Natural Person subscribers
 
-# In[31]:
+# In[34]:
 
 
 display(compute_attractiveness_score(
     natural_persons_df)['AttractivenessScore'].describe())
 
 
-# In[32]:
+# In[35]:
 
 
 plot_attractiveness_score_of_companies(
@@ -773,9 +802,52 @@ plot_attractiveness_score_of_companies(
 
 # # Yearly Attractiveness Scores of Companies
 # 
+# Before starting yearly score calculations let's exclude companies that has operated less than a year in the relevant market.
+# 
+
+# In[36]:
+
+
+all_df_exclude = all_df_active_months.loc[
+    all_df_active_months['Active Months'] < 12, 'Company']
+print("Companies that operated less than a year for All Subscribers:")
+print(", ".join(all_df_exclude.to_list())
+      if len (all_df_exclude) else "No such company found...")
+
+
+# In[37]:
+
+
+legal_entities_df_exclude = legal_entities_df_active_months.loc[
+    legal_entities_df_active_months['Active Months'] < 12, 'Company']
+print("Companies that operated less than a year for Legal Entities:")
+print(", ".join(legal_entities_df_exclude.to_list())
+      if len(legal_entities_df_exclude) else "No such company found...")
+
+
+# In[38]:
+
+
+natural_persons_df_exclude = natural_persons_df_active_months.loc[
+    natural_persons_df_active_months['Active Months'] < 12, 'Company']
+print("Companies that operated less than a year for Natural Persons:")
+print(", ".join(natural_persons_df_exclude.to_list())
+      if len(natural_persons_df_exclude) else "No such company found...")
+
+
+# In[39]:
+
+
+all_df = all_df.loc[~all_df['Company'].isin(all_df_exclude)]
+legal_entities_df = legal_entities_df.loc[
+    ~legal_entities_df['Company'].isin(legal_entities_df_exclude)]
+natural_persons_df = natural_persons_df.loc[
+    ~natural_persons_df['Company'].isin(natural_persons_df_exclude)]
+
+
 # ## Yearly Scores for All subscribers
 
-# In[33]:
+# In[40]:
 
 
 def get_top_3_companies_per_year(df: pd.DataFrame) -> pd.DataFrame:
@@ -833,13 +905,14 @@ def plot_yearly_attractiveness_score_of_companies(df: pd.DataFrame,
 
 title = "Yearly Attractiveness Scores of companies for All subscribers"
 print(f'\n{title}:\n')
-display(get_top_3_companies_per_year(all_df))
+all_top3_df = get_top_3_companies_per_year(all_df)
+display(all_top3_df)
 plot_yearly_attractiveness_score_of_companies(all_df, title)
 
 
 # ## Yearly Scores for Legal Entity subscribers
 
-# In[34]:
+# In[41]:
 
 
 title = ("Yearly Attractiveness Scores of companies "
@@ -851,7 +924,7 @@ plot_yearly_attractiveness_score_of_companies(legal_entities_df, title)
 
 # ## Yearly Scores for Natural Person subscribers
 
-# In[35]:
+# In[42]:
 
 
 title = ("Yearly Attractiveness Scores of companies "
@@ -863,7 +936,7 @@ plot_yearly_attractiveness_score_of_companies(natural_persons_df, title)
 
 # # Top Companies by Attractiveness Score
 
-# In[36]:
+# In[43]:
 
 
 def get_top_companies_per_year(df: pd.DataFrame, name: str) -> pd.DataFrame:
@@ -918,29 +991,157 @@ for category in ('For All subscribers', 'For Legal Entity subscribers',
     print()
 
 
-# In[37]:
+# In[44]:
+
+
+def get_full_years(df: pd.DataFrame) -> pd.DataFrame:
+    df = extract_available_months(df)
+    return (df
+            .loc[df['Months']=='January - December']
+            .reset_index()['Year']
+            .sort_values(ascending=False)
+            .reset_index(drop=True))
+
+
+# In[45]:
+
+
+def get_321_df(df: pd.DataFrame, full_years: pd.Series) -> pd.DataFrame:
+    df = df.loc[full_years, "Company"].melt(ignore_index=False).reset_index()
+    df['Score'] = -1 * (df['Place'] - 4)
+    return df
+
+
+# In[46]:
+
+
+full_years = get_full_years(all_df)
+all_321_df = get_321_df(all_top3_df, full_years)
+
+width_123 = 8
+height_123 = 3
+
+ncols = 3
+nrows = len(full_years) - 1 + ncols
+nrows = np.ceil(nrows / ncols).astype(int)
+
+
+fig = plt.figure(figsize=(ncols*width_123, nrows*height_123))
+
+
+def plot_123(ax: plt.Axes, year: int):
+    width = 0.35  # the width of the bars
+    x = np.arange(len([1]))
+    first_place, second_place, third_place = [
+        all_321_df.loc[(all_321_df['Year']==year)&(all_321_df['Place']==i),
+                       'value'].item()
+        for i in (1, 2, 3)
+    ]
+
+    rects1 = ax.bar(x - (width/2), [3], width, label=first_place,
+                    color=company_colors[first_place])
+    rects2 = ax.bar(x + (width/2), [2], width, label=second_place,
+                    color=company_colors[second_place])
+    rects3 = ax.bar(x - (width/2) -width, [1], width, label=third_place,
+                    color=company_colors[third_place])
+    ax.annotate(
+        first_place,
+        xy=(0-(width/2),3.25),
+        fontsize=14, fontweight='bold',
+        va="center", ha="center", alpha=0.85,
+        color=company_colors[first_place]
+    )
+    ax.annotate(
+        second_place,
+        xy=(0+(width/2),2.25),
+        fontsize=14, fontweight='bold',
+        va="center", ha="center", alpha=0.85,
+        color=company_colors[second_place]
+    )
+    ax.annotate(
+        third_place,
+        xy=(-0-(width/2)-width,1.25),
+        fontsize=14, fontweight='bold',
+        va="center", ha="center", alpha=0.85,
+        color=company_colors[third_place]
+    )
+    ax.annotate(
+        "1",
+        xy=(0-(width/2),1.65),
+        fontsize=36, fontweight='bold',
+        va="center", ha="center", alpha=0.85, color='w'
+    )
+    ax.annotate(
+        "2",
+        xy=(0+(width/2),1.05),
+        fontsize=36, fontweight='bold',
+        va="center", ha="center", alpha=0.85, color='w'
+    )
+    ax.annotate(
+        "3",
+        xy=(-0-(width/2)-width,0.45),
+        fontsize=36, fontweight='bold',
+        va="center", ha="center", alpha=0.85, color='w'
+    )
+
+    ax.set_yticks([0,3.7])
+    ax.set_xticks([-2*width-0.75*width,0,1*width+0.75*width])
+    ax.set_axis_off()
+    ax.set_title(f'{year}', fontdict={
+        "weight": "bold",
+        "size": 24,
+        "color": "#444444",
+    })
+
+
+ax = fig.add_subplot(nrows,1,1)
+plot_123(ax, full_years[0].item())
+
+for idx,year in full_years[1:].iteritems():
+    ax = fig.add_subplot(nrows, ncols, idx+ncols)
+    plot_123(ax, year)
+
+fig.tight_layout(h_pad=4)
+
+
+
+##
+# Instead of displaying here save the plot as `ranking.png` image file
+# in order to display in the beggining of this notebook.
+# FIXME: This approach may require 2x run of notebook to update the map
+##
+fig.savefig("ranking.png")
+
+
+# plt.show()
+
+
+plt.close(fig)
+
+
+# In[47]:
 
 
 print(f"\n ** Total Elapsed time: {datetime.utcnow() - nb_st} ** \n")
 print(f"Notebook END time: {datetime.utcnow()} UTC\n")
 
 
-# In[38]:
+# In[48]:
 
 
 get_ipython().run_cell_magic('capture', '', '%mkdir OGP_classic\n')
 
 
-# In[39]:
+# In[49]:
 
 
 get_ipython().run_cell_magic('capture', '', '%%file "OGP_classic/conf.json"\n{\n  "base_template": "classic",\n  "preprocessors": {\n    "500-metadata": {\n      "type": "nbconvert.preprocessors.ClearMetadataPreprocessor",\n      "enabled": true,\n      "clear_notebook_metadata": true,\n      "clear_cell_metadata": true\n    },\n    "900-files": {\n      "type": "nbconvert.preprocessors.ExtractOutputPreprocessor",\n      "enabled": true\n    }\n  }\n}\n')
 
 
-# In[40]:
+# In[50]:
 
 
-get_ipython().run_cell_magic('capture', '', '%%file "OGP_classic/index.html.j2"\n{%- extends \'classic/index.html.j2\' -%}\n{%- block html_head -%}\n\n{#  OGP attributes for shareability #}\n<meta property="og:url"          content="https://sentinel-1.github.io/mobile_subscribers_Georgia/" />\n<meta property="og:type"         content="article" />\n<meta property="og:title"        content="Ranking of Mobile Operators Companies in Georgia" />\n<meta property="og:description"  content="Which companies are preffered by mobile subscribers in Georgia?" />\n<meta property="og:image"        content="https://raw.githubusercontent.com/sentinel-1/mobile_subscribers_Georgia/master/images/ASA_Mobile_123.png" />\n<meta property="og:image:alt"    content="ASA Mobile Companies Ranking 123 logo" />\n<meta property="og:image:type"   content="image/png" />\n<meta property="og:image:width"  content="1200" />\n<meta property="og:image:height" content="628" />\n    \n<meta property="article:published_time" content="2022-05-23T22:33:25+00:00" />\n<meta property="article:modified_time"  content="{{ resources.iso8610_datetime_now }}" />\n<meta property="article:publisher"      content="https://sentinel-1.github.io" />\n<meta property="article:author"         content="https://github.com/sentinel-1" />\n<meta property="article:section"        content="datascience" />\n<meta property="article:tag"            content="datascience" />\n<meta property="article:tag"            content="Python" />\n<meta property="article:tag"            content="data" />\n<meta property="article:tag"            content="analytics" />\n<meta property="article:tag"            content="datavisualization" />\n<meta property="article:tag"            content="bigdataunit" />\n<meta property="article:tag"            content="visualization" />\n<meta property="article:tag"            content="mobilesubscribers" />\n<meta property="article:tag"            content="mobilecompanies" />\n<meta property="article:tag"            content="ranking" />\n<meta property="article:tag"            content="telecomunication" />\n\n\n<link rel="icon" type="image/x-icon" href="../favicon.ico">\n\n{{ super() }}\n\n{%- endblock html_head -%}\n    \n    \n{% block body_header %}\n<body>\n    \n<div class="container">\n  <nav class="navbar navbar-default">\n    <div class="container-fluid">\n      <ul class="nav nav-pills  navbar-left">\n        <li role="presentation">\n          <a href="/">\n            <svg xmlns="http://www.w3.org/2000/svg"\n                 viewBox="0 0 576 512" width="1em">\n              <path \n                fill="#999999"\nd="M 288,0 574,288 511,288 511,511 352,511 352,352 223,352 223,511 62,511 64,288 0,288 Z"\n              />\n            </svg> Home\n          </a>\n        </li>\n      </ul>\n      <ul class="nav nav-pills  navbar-right">\n        <li role="presentation" class="active">\n          <a href="/mobile_subscribers_Georgia/">🇬🇧 English </a>\n        </li>\n        <li role="presentation">\n          <a href="/mobile_subscribers_Georgia/ka/">🇬🇪 ქართული</a>\n        </li>\n      </ul>\n    </div>\n  </nav>\n</div>\n\n\n\n  <div tabindex="-1" id="notebook" class="border-box-sizing">\n    <div class="container" id="notebook-container">    \n{% endblock body_header %}\n\n{% block body_footer %}\n    </div>\n  </div>\n  <footer>\n    <div class="container"\n         style="display:flex; flex-direction: row; justify-content: center; align-items: center;">\n      <p style="margin: 3.7em auto;"> © 2022\n        <a href="https://github.com/sentinel-1" target="_blank">Sentinel-1</a>\n      </p>\n      <!-- TOP.GE ASYNC COUNTER CODE -->\n      <div id="top-ge-counter-container" data-site-id="116052"\n           style="margin-right: 3.7em;float: right;"></div>\n      <script async src="//counter.top.ge/counter.js"></script>\n      <!-- / END OF TOP.GE COUNTER CODE -->\n      <!-- ANALYTICS.LAGOGAL.COM -->\n      <div id="analytics-lagogal-com-access" data-site-id="20221"\n           style="margin: 0;padding: 0;"></div>\n      <script async src="//analytics.lagogal.com/access.js"></script>\n      <!-- / END OF ANALYTICS.LAGOGAL.COM -->\n     </div>\n  </footer>\n</body>\n{% endblock body_footer %}\n')
+get_ipython().run_cell_magic('capture', '', '%%file "OGP_classic/index.html.j2"\n{%- extends \'classic/index.html.j2\' -%}\n{%- block html_head -%}\n\n{#  OGP attributes for shareability #}\n<meta property="og:url"          content="https://sentinel-1.github.io/mobile_subscribers_Georgia/" />\n<meta property="og:type"         content="article" />\n<meta property="og:title"        content="Ranking of Mobile Network Operators in Georgia" />\n<meta property="og:description"  content="Which companies are preffered by mobile subscribers in Georgia?" />\n<meta property="og:image"        content="https://raw.githubusercontent.com/sentinel-1/mobile_subscribers_Georgia/master/images/ASA_Mobile_123.png" />\n<meta property="og:image:alt"    content="ASA Mobile Companies Ranking 123 logo" />\n<meta property="og:image:type"   content="image/png" />\n<meta property="og:image:width"  content="1200" />\n<meta property="og:image:height" content="628" />\n    \n<meta property="article:published_time" content="2022-05-23T22:33:25+00:00" />\n<meta property="article:modified_time"  content="{{ resources.iso8610_datetime_now }}" />\n<meta property="article:publisher"      content="https://sentinel-1.github.io" />\n<meta property="article:author"         content="https://github.com/sentinel-1" />\n<meta property="article:section"        content="datascience" />\n<meta property="article:tag"            content="datascience" />\n<meta property="article:tag"            content="Python" />\n<meta property="article:tag"            content="data" />\n<meta property="article:tag"            content="analytics" />\n<meta property="article:tag"            content="datavisualization" />\n<meta property="article:tag"            content="bigdataunit" />\n<meta property="article:tag"            content="visualization" />\n<meta property="article:tag"            content="mobilesubscribers" />\n<meta property="article:tag"            content="mobilecompanies" />\n<meta property="article:tag"            content="ranking" />\n<meta property="article:tag"            content="telecomunication" />\n\n\n<link rel="icon" type="image/x-icon" href="../favicon.ico">\n\n{{ super() }}\n\n{%- endblock html_head -%}\n    \n    \n{% block body_header %}\n<body>\n    \n<div class="container">\n  <nav class="navbar navbar-default">\n    <div class="container-fluid">\n      <ul class="nav nav-pills  navbar-left">\n        <li role="presentation">\n          <a href="/">\n            <svg xmlns="http://www.w3.org/2000/svg"\n                 viewBox="0 0 576 512" width="1em">\n              <path \n                fill="#999999"\nd="M 288,0 574,288 511,288 511,511 352,511 352,352 223,352 223,511 62,511 64,288 0,288 Z"\n              />\n            </svg> Home\n          </a>\n        </li>\n      </ul>\n      <ul class="nav nav-pills  navbar-right">\n        <li role="presentation" class="active">\n          <a href="/mobile_subscribers_Georgia/">🇬🇧 English </a>\n        </li>\n        <li role="presentation">\n          <a href="/mobile_subscribers_Georgia/ka/">🇬🇪 ქართული</a>\n        </li>\n      </ul>\n    </div>\n  </nav>\n</div>\n\n\n\n  <div tabindex="-1" id="notebook" class="border-box-sizing">\n    <div class="container" id="notebook-container">    \n{% endblock body_header %}\n\n{% block body_footer %}\n    </div>\n  </div>\n  <footer>\n    <div class="container"\n         style="display:flex; flex-direction: row; justify-content: center; align-items: center;">\n      <p style="margin: 3.7em auto;"> © 2022\n        <a href="https://github.com/sentinel-1" target="_blank">Sentinel-1</a>\n      </p>\n      <!-- TOP.GE ASYNC COUNTER CODE -->\n      <div id="top-ge-counter-container" data-site-id="116052"\n           style="margin-right: 3.7em;float: right;"></div>\n      <script async src="//counter.top.ge/counter.js"></script>\n      <!-- / END OF TOP.GE COUNTER CODE -->\n      <!-- ANALYTICS.LAGOGAL.COM -->\n      <div id="analytics-lagogal-com-access" data-site-id="20221"\n           style="margin: 0;padding: 0;"></div>\n      <script async src="//analytics.lagogal.com/access.js"></script>\n      <!-- / END OF ANALYTICS.LAGOGAL.COM -->\n     </div>\n  </footer>\n</body>\n{% endblock body_footer %}\n')
 
 
 # 
