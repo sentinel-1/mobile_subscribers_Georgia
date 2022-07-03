@@ -12,7 +12,7 @@
 <meta property="og:image:height" content="628" />
     
 <meta property="article:published_time" content="2022-05-23T22:33:25+00:00" />
-<meta property="article:modified_time"  content="2022-07-02T19:03:09+00:00" />
+<meta property="article:modified_time"  content="2022-07-03T05:17:14+00:00" />
 <meta property="article:publisher"      content="https://sentinel-1.github.io" />
 <meta property="article:author"         content="https://github.com/sentinel-1" />
 <meta property="article:section"        content="datascience" />
@@ -13231,7 +13231,7 @@ d="M 288,0 574,288 511,288 511,511 352,511 352,352 223,352 223,511 62,511 64,288
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>
-Notebook START time: 2022-07-02 19:01:14.753569 UTC
+Notebook START time: 2022-07-03 05:15:09.128193 UTC
 
 </pre>
 </div>
@@ -16668,8 +16668,10 @@ For Natural Person subscribers during the 2010 – 2021 years the following comp
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_321_df</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">full_years</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">full_years</span><span class="p">,</span> <span class="s2">&quot;Company&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">ignore_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">full_years</span><span class="p">,</span> <span class="s2">&quot;Company&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">ignore_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                            <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;Company&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Place&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">df</span>
     <span class="k">return</span> <span class="n">df</span>
 </pre></div>
 
@@ -16697,12 +16699,12 @@ For Natural Person subscribers during the 2010 – 2021 years the following comp
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">ncols</span><span class="o">*</span><span class="n">width_123</span><span class="p">,</span> <span class="n">nrows</span><span class="o">*</span><span class="n">height_123</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">plot_123</span><span class="p">(</span><span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="n">year</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">plot_123</span><span class="p">(</span><span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="n">year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">big_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
     <span class="n">width</span> <span class="o">=</span> <span class="mf">0.35</span>  <span class="c1"># the width of the bars</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">([</span><span class="mi">1</span><span class="p">]))</span>
     <span class="n">first_place</span><span class="p">,</span> <span class="n">second_place</span><span class="p">,</span> <span class="n">third_place</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">all_321_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">all_321_df</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">year</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">all_321_df</span><span class="p">[</span><span class="s1">&#39;Place&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">i</span><span class="p">),</span>
-                       <span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                       <span class="s1">&#39;Company&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
     <span class="p">]</span>
 
@@ -16714,22 +16716,22 @@ For Natural Person subscribers during the 2010 – 2021 years the following comp
                     <span class="n">color</span><span class="o">=</span><span class="n">company_colors</span><span class="p">[</span><span class="n">third_place</span><span class="p">])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
         <span class="n">first_place</span><span class="p">,</span>
-        <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="o">-</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mf">3.25</span><span class="p">),</span>
-        <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+        <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="o">-</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mf">3.25</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">big_text</span> <span class="k">else</span> <span class="mf">3.75</span><span class="p">),</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">big_text</span> <span class="k">else</span> <span class="mi">36</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
         <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
         <span class="n">color</span><span class="o">=</span><span class="n">company_colors</span><span class="p">[</span><span class="n">first_place</span><span class="p">]</span>
     <span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
         <span class="n">second_place</span><span class="p">,</span>
-        <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="o">+</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mf">2.25</span><span class="p">),</span>
-        <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+        <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="o">+</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="mf">2.25</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">big_text</span> <span class="k">else</span> <span class="mf">2.75</span><span class="p">),</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">big_text</span> <span class="k">else</span> <span class="mi">36</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
         <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
         <span class="n">color</span><span class="o">=</span><span class="n">company_colors</span><span class="p">[</span><span class="n">second_place</span><span class="p">]</span>
     <span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
         <span class="n">third_place</span><span class="p">,</span>
-        <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">0</span><span class="o">-</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">width</span><span class="p">,</span><span class="mf">1.25</span><span class="p">),</span>
-        <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+        <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">0</span><span class="o">-</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">width</span><span class="p">,</span> <span class="mf">1.25</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">big_text</span> <span class="k">else</span> <span class="mf">1.75</span><span class="p">),</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">big_text</span> <span class="k">else</span> <span class="mi">36</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
         <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
         <span class="n">color</span><span class="o">=</span><span class="n">company_colors</span><span class="p">[</span><span class="n">third_place</span><span class="p">]</span>
     <span class="p">)</span>
@@ -16752,25 +16754,24 @@ For Natural Person subscribers during the 2010 – 2021 years the following comp
         <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;w&#39;</span>
     <span class="p">)</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">3.7</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">3.7</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">big_text</span> <span class="k">else</span> <span class="mf">4.75</span><span class="p">])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">width</span><span class="o">-</span><span class="mf">0.75</span><span class="o">*</span><span class="n">width</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="o">*</span><span class="n">width</span><span class="o">+</span><span class="mf">0.75</span><span class="o">*</span><span class="n">width</span><span class="p">])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="s2">&quot;bold&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
+        <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">24</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">big_text</span> <span class="k">else</span> <span class="mi">44</span><span class="p">,</span>
         <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;#444444&quot;</span><span class="p">,</span>
     <span class="p">})</span>
 
 
-<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">plot_123</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">full_years</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+<span class="n">top_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plot_123</span><span class="p">(</span><span class="n">top_ax</span><span class="p">,</span> <span class="n">full_years</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">big_text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">year</span> <span class="ow">in</span> <span class="n">full_years</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">idx</span><span class="o">+</span><span class="n">ncols</span><span class="p">)</span>
     <span class="n">plot_123</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">h_pad</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-
 
 
 <span class="c1">##</span>
@@ -16816,9 +16817,9 @@ For Natural Person subscribers during the 2010 – 2021 years the following comp
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>
- ** Total Elapsed time: 0:00:16.258178 ** 
+ ** Total Elapsed time: 0:00:16.352619 ** 
 
-Notebook END time: 2022-07-02 19:01:31.011812 UTC
+Notebook END time: 2022-07-03 05:15:25.480871 UTC
 
 </pre>
 </div>
