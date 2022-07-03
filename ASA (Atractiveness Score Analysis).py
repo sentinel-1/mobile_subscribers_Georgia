@@ -1007,8 +1007,10 @@ def get_full_years(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_321_df(df: pd.DataFrame, full_years: pd.Series) -> pd.DataFrame:
-    df = df.loc[full_years, "Company"].melt(ignore_index=False).reset_index()
+    df = df.loc[full_years, "Company"].melt(ignore_index=False,
+                                            value_name='Company').reset_index()
     df['Score'] = -1 * (df['Place'] - 4)
+    df
     return df
 
 
@@ -1029,12 +1031,12 @@ nrows = np.ceil(nrows / ncols).astype(int)
 fig = plt.figure(figsize=(ncols*width_123, nrows*height_123))
 
 
-def plot_123(ax: plt.Axes, year: int):
+def plot_123(ax: plt.Axes, year: int, big_text: bool = False):
     width = 0.35  # the width of the bars
     x = np.arange(len([1]))
     first_place, second_place, third_place = [
         all_321_df.loc[(all_321_df['Year']==year)&(all_321_df['Place']==i),
-                       'value'].item()
+                       'Company'].item()
         for i in (1, 2, 3)
     ]
 
@@ -1046,22 +1048,22 @@ def plot_123(ax: plt.Axes, year: int):
                     color=company_colors[third_place])
     ax.annotate(
         first_place,
-        xy=(0-(width/2),3.25),
-        fontsize=14, fontweight='bold',
+        xy=(0-(width/2),3.25 if not big_text else 3.75),
+        fontsize=14 if not big_text else 36, fontweight='bold',
         va="center", ha="center", alpha=0.85,
         color=company_colors[first_place]
     )
     ax.annotate(
         second_place,
-        xy=(0+(width/2),2.25),
-        fontsize=14, fontweight='bold',
+        xy=(0+(width/2), 2.25 if not big_text else 2.75),
+        fontsize=14 if not big_text else 36, fontweight='bold',
         va="center", ha="center", alpha=0.85,
         color=company_colors[second_place]
     )
     ax.annotate(
         third_place,
-        xy=(-0-(width/2)-width,1.25),
-        fontsize=14, fontweight='bold',
+        xy=(-0-(width/2)-width, 1.25 if not big_text else 1.75),
+        fontsize=14 if not big_text else 36, fontweight='bold',
         va="center", ha="center", alpha=0.85,
         color=company_colors[third_place]
     )
@@ -1084,25 +1086,24 @@ def plot_123(ax: plt.Axes, year: int):
         va="center", ha="center", alpha=0.85, color='w'
     )
 
-    ax.set_yticks([0,3.7])
+    ax.set_yticks([0,3.7 if not big_text else 4.75])
     ax.set_xticks([-2*width-0.75*width,0,1*width+0.75*width])
     ax.set_axis_off()
     ax.set_title(f'{year}', fontdict={
         "weight": "bold",
-        "size": 24,
+        "size": 24 if not big_text else 44,
         "color": "#444444",
     })
 
 
-ax = fig.add_subplot(nrows,1,1)
-plot_123(ax, full_years[0].item())
+top_ax = fig.add_subplot(nrows,1,1)
+plot_123(top_ax, full_years[0].item(), big_text=True)
 
 for idx,year in full_years[1:].iteritems():
     ax = fig.add_subplot(nrows, ncols, idx+ncols)
     plot_123(ax, year)
 
 fig.tight_layout(h_pad=4)
-
 
 
 ##
