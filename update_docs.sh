@@ -4,6 +4,7 @@
 VENV_NAME=env_mobile_subscribers_Georgia
 
 NOTEBOOK_NAME="ASA (Atractiveness Score Analysis).ipynb"
+NOTEBOOK_NAME_KA="მობილური ოპერატორების რეიტინგი.ipynb"
 
 
 SELF=$(python3 -c "import os; print(os.path.realpath('${BASH_SOURCE[0]}'))")
@@ -14,6 +15,7 @@ export JUPYTER_CONFIG_DIR="${SCRIPT_DIR}/.jupyter"
 
 
 DOCS_DIR="${SCRIPT_DIR}/docs"
+DOCS_DIR_KA="${SCRIPT_DIR}/docs/ka"
 
 
 ##
@@ -24,21 +26,32 @@ DOCS_DIR="${SCRIPT_DIR}/docs"
   --to html --output-dir="${DOCS_DIR}" --output="index" --template OGP_classic
 
 ##
+# Generate HTML (ka_GE)
+##
+"${ENV_BIN}jupyter-nbconvert" "${NOTEBOOK_NAME_KA}" \
+  --config "${JUPYTER_CONFIG_DIR}/jupyter_lab_config.py" \
+  --to html --output-dir="${DOCS_DIR_KA}" --output="index" --template OGP_classic_ka
+
+
+##
 # Update the ranking.png
 ##
 cp -f ranking.png "${DOCS_DIR}"
+cp -f ranking.png "${DOCS_DIR_KA}"
 
 
 ##
 # Update the `images/` folder
 ##
 cp -rf images/ "${DOCS_DIR}"
+cp -rf images/ "${DOCS_DIR_KA}"
 
 ##
 # Generate PDF
 ##
 "${ENV_BIN}jupyter-nbconvert" "${NOTEBOOK_NAME}" \
   --embed-images --to pdf --output-dir="${DOCS_DIR}"
+
 
 ##
 # Update custom 404 page
